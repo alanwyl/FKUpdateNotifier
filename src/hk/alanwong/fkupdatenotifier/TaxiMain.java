@@ -17,6 +17,10 @@ public class TaxiMain extends ListActivity {
 
     public class TaxiAdapter extends ArrayAdapter<Taxi> {
         private ArrayList<Taxi> items;
+        
+        //testing new things
+        private int useless = 0;
+        
         private TaxiViewHolder taxiHolder;
 
         private class TaxiViewHolder {
