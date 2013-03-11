@@ -1,17 +1,10 @@
 package hk.alanwong.fkupdatenotifier;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URL;
-
-import org.apache.http.client.*;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.*;
+import java.io.*;
+import java.net.*;
 
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ListFragment;
 import android.view.*;
 import android.widget.*;
@@ -24,50 +17,42 @@ public class NotifierFragment extends ListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);	
 		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+		
 		//-----start
-		HttpURLConnection urlConnection = null;
-	    URL url = new URL("http://minooch.com/franciscofranco/Nexus4/4.2.2/appfiles/nightly");
-
-	    urlConnection = (HttpURLConnection) url.openConnection();
-	    urlConnection.setReadTimeout(15000);
-	    urlConnection.setConnectTimeout(15000);
-	    urlConnection.setUseCaches(false);
-	    urlConnection.setDefaultUseCaches(false);
-
-	    try {
+		String[] values = null;
+		try{
+		    URL url = new URL("http://minooch.com/franciscofranco/Nexus4/4.2.2/appfiles/nightly");
+		    
+			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+		    urlConnection.setReadTimeout(15000);
+		    urlConnection.setConnectTimeout(15000);
+		    urlConnection.setUseCaches(false);
+		    urlConnection.setDefaultUseCaches(false);
 			urlConnection.setRequestMethod("GET");
+		    urlConnection.setDoOutput(true);
+		    urlConnection.setDoInput(true);
+			urlConnection.connect();
+	
+		    InputStream inpStream = urlConnection.getInputStream();
+				
+	        values = new String[] { 
+					"Latest nightly - r100", "Latest test", "Current installed", inpStream.toString()
+			}; 
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (ProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-	    urlConnection.setDoOutput(true);
-	    urlConnection.setDoInput(true);
-
-	    try {
-			urlConnection.connect();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-
-	    InputStream inpStream;
-		try {
-			inpStream = urlConnection.getInputStream();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-        String[] values = new String[] { 
-				"Latest nightly - " + inpStream, "Latest test", "Current installed" 
-		};
-        
+		} 
         //end
 		
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.two_line_list_item, values);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_2, values);
 				
 		setListAdapter(adapter);		
 	}
